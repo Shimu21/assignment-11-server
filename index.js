@@ -30,6 +30,14 @@ async function run() {
             res.send(service)
         })
 
+        app.get('/myItem', async (req, res) => {
+            const email = req.query.email;
+            const query = { email: email };
+            const cursor = servicesCollection.find(query);
+            const myItems = await cursor.toArray();
+            res.send(myItems)
+        })
+
 
         app.post('/services', async (req, res) => {
             const newService = req.body;
