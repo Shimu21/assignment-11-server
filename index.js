@@ -26,10 +26,12 @@ function verifyJWT(req, res, next) {
 
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const uri = `mongodb+srv://kiddoWarehouse:${process.env.DB_PASS}@cluster0.ywstc.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
+console.log(uri);
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
 async function run() {
     try {
+        //server connected
         client.connect();
         const servicesCollection = client.db("kiddoWarehouse").collection('services');
 
