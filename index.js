@@ -1,10 +1,10 @@
 const express = require('express');
 const cors = require('cors');
-require('dotenv').config();
 const jwt = require('jsonwebtoken');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+require('dotenv').config();
 const app = express();
-const port = process.env.PORT || 8000;
-const { ObjectId } = require('mongodb');
+const port = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
@@ -19,13 +19,11 @@ function verifyJWT(req, res, next) {
         if (err) {
             return res.status(403).send({ message: "Forbidden Access" });
         }
-        console.log("decoded", decoded);
         req.decoded = decoded;
         next();
     })
 }
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
 const uri = `mongodb+srv://kiddoWarehouse:${process.env.DB_PASS}@cluster0.ywstc.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 console.log(uri);
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
@@ -59,9 +57,10 @@ async function run() {
             res.send(service)
         })
 
-        app.get('/myItems', verifyJWT, async (req, res) => {
+        app.get('/myItems', async (req, res) => {
             const decodedEmail = req.decoded.email;
             const email = req.query.email;
+            console.log(decodedEmail, email);
             if (email === decodedEmail) {
                 const query = { email: email };
                 const cursor = servicesCollection.find(query);
