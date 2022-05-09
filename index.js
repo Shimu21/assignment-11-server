@@ -15,17 +15,17 @@ function verifyJWT(req, res, next) {
         return res.status(401).send({ message: 'unauthorized access' })
     }
     const token = authHeader.split(' ')[1];
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
-        if (err) {
-            return res.status(403).send({ message: "Forbidden Access" });
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (error, decoded) => {
+        if (error) {
+            return res.status(403).send({ message: "Forbidden Access" })
         }
+        console.log("decoded", decoded);
         req.decoded = decoded;
         next();
     })
 }
 
 const uri = `mongodb+srv://kiddoWarehouse:${process.env.DB_PASS}@cluster0.ywstc.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
-console.log(uri);
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
 async function run() {
@@ -57,21 +57,20 @@ async function run() {
             res.send(service)
         })
 
-        app.get('/myItems', async (req, res) => {
+        app.get('/myItems', verifyJWT, async (req, res) => {
             const decodedEmail = req.decoded.email;
             const email = req.query.email;
-            console.log(decodedEmail, email);
             if (email === decodedEmail) {
                 const query = { email: email };
                 const cursor = servicesCollection.find(query);
-                const services = await cursor.toArray();
-                res.send(services);
+                const orders = await cursor.toArray();
+                res.send(orders)
             }
             else {
-                res.status(403).send({ message: 'forbidden access' })
+                res.status(403).send({ message: "forbidden access" })
             }
-
         })
+
 
         app.post('/services', async (req, res) => {
             const newService = req.body;
